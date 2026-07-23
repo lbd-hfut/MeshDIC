@@ -12,8 +12,18 @@ endif()
 find_package(pybind11 CONFIG REQUIRED)
 
 # Eigen
-set(EIGEN3_INCLUDE_DIR "C:/Users/lbd/miniconda3/Library/include/eigen3" CACHE PATH
-    "Path to Eigen headers")
+if(NOT DEFINED EIGEN3_INCLUDE_DIR)
+    if(DEFINED ENV{CONDA_PREFIX} AND WIN32)
+        set(EIGEN3_INCLUDE_DIR "$ENV{CONDA_PREFIX}/Library/include/eigen3" CACHE PATH
+            "Path to Eigen headers")
+    elseif(DEFINED ENV{CONDA_PREFIX})
+        set(EIGEN3_INCLUDE_DIR "$ENV{CONDA_PREFIX}/include/eigen3" CACHE PATH
+            "Path to Eigen headers")
+    else()
+        set(EIGEN3_INCLUDE_DIR "" CACHE PATH "Path to Eigen headers")
+    endif()
+endif()
+
 if(EXISTS "${EIGEN3_INCLUDE_DIR}/Eigen/Core")
     set(eigen_SOURCE_DIR "${EIGEN3_INCLUDE_DIR}")
 else()
@@ -31,13 +41,30 @@ else()
 endif()
 
 # OpenCV
-set(OpenCV_DIR "C:/Users/lbd/miniconda3/Library")
+if(NOT DEFINED OpenCV_DIR)
+    if(DEFINED ENV{CONDA_PREFIX} AND WIN32)
+        set(OpenCV_DIR "$ENV{CONDA_PREFIX}/Library" CACHE PATH "Path to OpenCV")
+    elseif(DEFINED ENV{CONDA_PREFIX})
+        set(OpenCV_DIR "$ENV{CONDA_PREFIX}" CACHE PATH "Path to OpenCV")
+    else()
+        set(OpenCV_DIR "" CACHE PATH "Path to OpenCV")
+    endif()
+endif()
+
 set(OpenCV_INCLUDE_DIRS "${OpenCV_DIR}/include")
-file(GLOB OpenCV_CORE_LIB "${OpenCV_DIR}/lib/opencv_core*.lib")
-file(GLOB OpenCV_IMGPROC_LIB "${OpenCV_DIR}/lib/opencv_imgproc*.lib")
+if(WIN32)
+    file(GLOB OpenCV_CORE_LIB "${OpenCV_DIR}/lib/opencv_core*.lib")
+    file(GLOB OpenCV_IMGPROC_LIB "${OpenCV_DIR}/lib/opencv_imgproc*.lib")
+else()
+    file(GLOB OpenCV_CORE_LIB "${OpenCV_DIR}/lib/libopencv_core*${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    file(GLOB OpenCV_IMGPROC_LIB "${OpenCV_DIR}/lib/libopencv_imgproc*${CMAKE_SHARED_LIBRARY_SUFFIX}")
+endif()
 
 if(NOT OpenCV_CORE_LIB)
     message(FATAL_ERROR "OpenCV core library not found in ${OpenCV_DIR}/lib")
+endif()
+if(NOT OpenCV_IMGPROC_LIB)
+    message(FATAL_ERROR "OpenCV imgproc library not found in ${OpenCV_DIR}/lib")
 endif()
 
 pybind11_add_module(_core
