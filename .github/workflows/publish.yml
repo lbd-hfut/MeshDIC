@@ -13,6 +13,7 @@ permissions:
 jobs:
   build-and-publish:
     runs-on: windows-latest
+    environment: pypi
 
     defaults:
       run:
