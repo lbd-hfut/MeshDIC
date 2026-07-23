@@ -5,6 +5,40 @@ __pycache__/
 
 # C extensions
 *.so
+*.pyd
+
+# CMake build artifacts
+_skbuild/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+CMakeUserPresets.json
+_deps/
+*.cmake
+!CMakeLists.txt
+
+# Local Codex / agent workspace state
+.agents/
+.codex/
+ISSUE_FOR_CODEX.md
+
+# Examples / cases generated output
+case/*/result/
+case/*/mesh/
+
+# Generated DIC arrays and plots
+results/
+*.npy
+*.npz
+overview.png
+compare_subset.png
+compare_subset_metrics.csv
+
+# Reference-code generated outputs and binary artifacts
+reference_code/**/results_folder*/
+reference_code/**/*.mat
+reference_code/**/*.mex*
+reference_code/**/*.asv
 
 # Distribution / packaging
 .Python
