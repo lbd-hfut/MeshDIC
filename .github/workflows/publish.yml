@@ -6,14 +6,15 @@ on:
       - "v*"
   workflow_dispatch:
 
-permissions:
-  contents: read
-  id-token: write
-
 jobs:
   build-and-publish:
     runs-on: windows-latest
-    environment: pypi
+    environment:
+      name: pypi
+      url: https://pypi.org/project/mesh-dic/
+    permissions:
+      contents: read
+      id-token: write
 
     defaults:
       run:
