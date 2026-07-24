@@ -29,20 +29,34 @@ jobs:
 
       - name: Install native build dependencies
         run: |
-          conda install -y -c conda-forge eigen opencv cmake ninja
+          conda install -y -n meshdic-build -c conda-forge eigen opencv cmake ninja
 
       - name: Install Python build tools
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install build twine
+          conda run -n meshdic-build python -m pip install --upgrade pip
+          conda run -n meshdic-build python -m pip install build twine
 
-      - name: Build wheel
+      - name: Build wheel (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
         run: |
-          python -m build --wheel
+          conda_env="$(conda info --base)/envs/meshdic-build"
+          conda run -n meshdic-build python -m build --wheel \
+            "-Ccmake.define.OpenCV_DIR=${conda_env}" \
+            "-Ccmake.define.EIGEN3_INCLUDE_DIR=${conda_env}/include/eigen3"
+
+      - name: Build wheel (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $condaEnv = Join-Path ((conda info --base).Trim()) 'envs\meshdic-build'
+          conda run -n meshdic-build python -m build --wheel `
+            "-Ccmake.define.OpenCV_DIR=$condaEnv\Library" `
+            "-Ccmake.define.EIGEN3_INCLUDE_DIR=$condaEnv\Library\include\eigen3"
 
       - name: Check wheel
         run: |
-          python -m twine check dist/*
+          conda run -n meshdic-build python -m twine check dist/*
 
       - uses: actions/upload-artifact@v4
         with:
