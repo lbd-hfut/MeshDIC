@@ -36,6 +36,22 @@ jobs:
           conda run -n meshdic-build python -m pip install --upgrade pip
           conda run -n meshdic-build python -m pip install build twine
 
+      - name: Inspect OpenCV headers (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          conda_env="$(conda info --base)/envs/meshdic-build"
+          find "${conda_env}/include" -path "*/opencv2/core.hpp" -print
+
+      - name: Inspect OpenCV headers (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $condaEnv = Join-Path ((conda info --base).Trim()) 'envs\meshdic-build'
+          Get-ChildItem -Path (Join-Path $condaEnv 'Library\include') -Recurse -Filter core.hpp |
+            Where-Object { $_.FullName -match 'opencv2' } |
+            Select-Object -ExpandProperty FullName
+
       - name: Build wheel (Linux)
         if: runner.os == 'Linux'
         shell: bash
@@ -43,6 +59,7 @@ jobs:
           conda_env="$(conda info --base)/envs/meshdic-build"
           conda run -n meshdic-build python -m build --wheel \
             "-Ccmake.define.OpenCV_DIR=${conda_env}" \
+            "-Ccmake.define.OpenCV_INCLUDE_DIRS=${conda_env}/include/opencv4" \
             "-Ccmake.define.EIGEN3_INCLUDE_DIR=${conda_env}/include/eigen3"
 
       - name: Build wheel (Windows)
@@ -52,6 +69,7 @@ jobs:
           $condaEnv = Join-Path ((conda info --base).Trim()) 'envs\meshdic-build'
           conda run -n meshdic-build python -m build --wheel `
             "-Ccmake.define.OpenCV_DIR=$condaEnv\Library" `
+            "-Ccmake.define.OpenCV_INCLUDE_DIRS=$condaEnv\Library\include" `
             "-Ccmake.define.EIGEN3_INCLUDE_DIR=$condaEnv\Library\include\eigen3"
 
       - name: Check wheel

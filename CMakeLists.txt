@@ -51,10 +51,20 @@ if(NOT DEFINED OpenCV_DIR)
     endif()
 endif()
 
-if(EXISTS "${OpenCV_DIR}/include/opencv4/opencv2/core.hpp")
-    set(OpenCV_INCLUDE_DIRS "${OpenCV_DIR}/include/opencv4")
-else()
-    set(OpenCV_INCLUDE_DIRS "${OpenCV_DIR}/include")
+if(NOT DEFINED OpenCV_INCLUDE_DIRS)
+    find_path(OpenCV_INCLUDE_DIRS
+        NAMES opencv2/core.hpp
+        HINTS
+            "${OpenCV_DIR}/include/opencv4"
+            "${OpenCV_DIR}/include"
+            "${OpenCV_DIR}/Library/include/opencv4"
+            "${OpenCV_DIR}/Library/include"
+        NO_DEFAULT_PATH
+    )
+endif()
+
+if(NOT OpenCV_INCLUDE_DIRS)
+    message(FATAL_ERROR "OpenCV headers not found under ${OpenCV_DIR}")
 endif()
 if(WIN32)
     file(GLOB OpenCV_CORE_LIB "${OpenCV_DIR}/lib/opencv_core*.lib")
