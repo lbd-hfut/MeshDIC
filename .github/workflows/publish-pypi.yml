@@ -60,9 +60,11 @@ jobs:
         shell: bash
         run: |
           conda_env="$(conda info --base)/envs/meshdic-build"
+          opencv_header="$(find "${conda_env}/include" -path "*/opencv2/core.hpp" -print -quit)"
+          opencv_include="${opencv_header%/opencv2/core.hpp}"
           conda run -n meshdic-build python -m build --wheel \
             "-Ccmake.define.OpenCV_DIR=${conda_env}" \
-            "-Ccmake.define.OpenCV_INCLUDE_DIRS=${conda_env}/include/opencv4" \
+            "-Ccmake.define.OpenCV_INCLUDE_DIRS=${opencv_include}" \
             "-Ccmake.define.EIGEN3_INCLUDE_DIR=${conda_env}/include/eigen3"
 
       - name: Build wheel (Windows)
@@ -70,9 +72,13 @@ jobs:
         shell: pwsh
         run: |
           $condaEnv = Join-Path ((conda info --base).Trim()) 'envs\meshdic-build'
+          $opencvHeader = Get-ChildItem -Path (Join-Path $condaEnv 'Library\include') -Recurse -Filter core.hpp |
+            Where-Object { $_.FullName -match 'opencv2' } |
+            Select-Object -First 1 -ExpandProperty FullName
+          $opencvInclude = Split-Path (Split-Path $opencvHeader -Parent) -Parent
           conda run -n meshdic-build python -m build --wheel `
             "-Ccmake.define.OpenCV_DIR=$condaEnv\Library" `
-            "-Ccmake.define.OpenCV_INCLUDE_DIRS=$condaEnv\Library\include" `
+            "-Ccmake.define.OpenCV_INCLUDE_DIRS=$opencvInclude" `
             "-Ccmake.define.EIGEN3_INCLUDE_DIR=$condaEnv\Library\include\eigen3"
 
       - name: Check wheel
