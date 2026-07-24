@@ -34,11 +34,8 @@ overview.png
 compare_subset.png
 compare_subset_metrics.csv
 
-# Reference-code generated outputs and binary artifacts
-reference_code/**/results_folder*/
-reference_code/**/*.mat
-reference_code/**/*.mex*
-reference_code/**/*.asv
+# Local reference implementations
+reference_code/
 
 # Distribution / packaging
 .Python

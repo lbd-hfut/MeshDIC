@@ -4,9 +4,7 @@ MeshDIC is a Python package for 2D finite-element global digital image
 correlation (FE-Global DIC). The high-cost numerical routines are implemented
 in C++ and exposed to Python with pybind11.
 
-The implementation follows the optimization flow of
-`2D_FE_Global_DIC-main`, with the upstream MATLAB code kept under
-`reference_code/` for comparison.
+The implementation follows the optimization flow of `2D_FE_Global_DIC-main`.
 
 ## Features
 
@@ -39,7 +37,6 @@ MeshDIC/
 |-- tests/
 |   |-- test_dic.py        # Smoke/unit tests
 |   `-- run_cases.py       # Run bundled cases
-|-- reference_code/        # MATLAB reference implementation
 `-- visualize_results.py   # Standalone visualization runner
 ```
 
@@ -233,7 +230,6 @@ functions, and FE pixel-field interpolation.
 - C++ core code lives under `src/cpp/`.
 - Rebuild after C++ edits with `python -m pip install -e .`.
 - Generated meshes and case results are intentionally ignored by Git.
-- The bundled MATLAB reference code is for algorithm comparison only.
 
 ## License
 
