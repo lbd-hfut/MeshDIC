@@ -29,7 +29,7 @@ jobs:
 
       - name: Install native build dependencies
         run: |
-          conda install -y -n meshdic-build -c conda-forge eigen opencv cmake ninja
+          conda install -y -n meshdic-build -c conda-forge eigen libopencv cmake ninja
 
       - name: Install Python build tools
         run: |
@@ -41,16 +41,19 @@ jobs:
         shell: bash
         run: |
           conda_env="$(conda info --base)/envs/meshdic-build"
-          find "${conda_env}/include" -path "*/opencv2/core.hpp" -print
+          find "${conda_env}/include" -path "*/opencv2/core.hpp" -print | tee /tmp/opencv-headers.txt
+          test -s /tmp/opencv-headers.txt
 
       - name: Inspect OpenCV headers (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $condaEnv = Join-Path ((conda info --base).Trim()) 'envs\meshdic-build'
-          Get-ChildItem -Path (Join-Path $condaEnv 'Library\include') -Recurse -Filter core.hpp |
+          $headers = Get-ChildItem -Path (Join-Path $condaEnv 'Library\include') -Recurse -Filter core.hpp |
             Where-Object { $_.FullName -match 'opencv2' } |
             Select-Object -ExpandProperty FullName
+          $headers
+          if (-not $headers) { throw 'OpenCV core.hpp not found' }
 
       - name: Build wheel (Linux)
         if: runner.os == 'Linux'
