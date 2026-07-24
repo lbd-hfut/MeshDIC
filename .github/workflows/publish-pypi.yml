@@ -9,9 +9,6 @@ on:
 jobs:
   build-and-publish:
     runs-on: windows-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/project/meshdic/
     permissions:
       contents: read
       id-token: write
