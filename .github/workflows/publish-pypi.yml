@@ -86,6 +86,7 @@ jobs:
           conda run -n meshdic-build python -m twine check dist/*
 
       - uses: actions/upload-artifact@v4
+        if: runner.os == 'Windows'
         with:
           name: wheels-${{ matrix.os }}
           path: dist/*.whl
